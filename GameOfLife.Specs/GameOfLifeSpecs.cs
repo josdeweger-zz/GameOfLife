@@ -46,7 +46,8 @@ namespace GameOfLife.Specs
         {
             Action result = () => new BoardBuilder()
                 .WithRows(-1)
-                .WithCols(2).Build();
+                .WithCols(2)
+                .Build();
 
             result.ShouldThrow<ArgumentException>();
         }

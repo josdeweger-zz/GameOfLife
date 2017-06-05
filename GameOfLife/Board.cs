@@ -60,8 +60,7 @@ namespace GameOfLife
         {
             if(rowNum > Rows.Count - 1)
                 throw new ArgumentOutOfRangeException($"Row {rowNum} does not exist");
-
-
+            
             if (colNum > Rows.ElementAt(rowNum).Cells.Count - 1)
                 throw new ArgumentOutOfRangeException($"Column {colNum} does not exist");
 
@@ -86,7 +85,7 @@ namespace GameOfLife
 
         private Cell CreateNextGenerationCell(int rowNum, int colNum)
         {
-            var previousGenerationAlive = Rows.ElementAt(rowNum).Cells.ElementAt(colNum).IsAlive;
+            var previousGenerationAlive = TryGetCell(rowNum, colNum).IsAlive;
 
             var nextGeneration = new Cell(previousGenerationAlive);
 
@@ -111,7 +110,7 @@ namespace GameOfLife
                 for (var sectionColNum = neighboursColStart; sectionColNum <= neighboursColEnd; sectionColNum++)
                 {
                     if (!(sectionRowNum == rowNum && sectionColNum == colNum))
-                        neighbours.Add(Rows.ElementAt(sectionRowNum).Cells.ElementAt(sectionColNum));
+                        neighbours.Add(TryGetCell(sectionRowNum, sectionColNum));
                 }
             }
 
