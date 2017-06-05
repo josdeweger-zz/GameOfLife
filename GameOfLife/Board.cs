@@ -87,13 +87,13 @@ namespace GameOfLife
         {
             var previousGenerationAlive = TryGetCell(rowNum, colNum).IsAlive;
 
-            var nextGeneration = new Cell(previousGenerationAlive);
+            var nextGenerationCell = new Cell(previousGenerationAlive);
 
             var neighbours = GetCellNeighbours(rowNum, colNum);
 
-            nextGeneration.NextGeneration(neighbours);
+            nextGenerationCell.NextGeneration(neighbours);
 
-            return nextGeneration;
+            return nextGenerationCell;
         }
 
         private List<Cell> GetCellNeighbours(int rowNum, int colNum)
