@@ -300,5 +300,118 @@ namespace GameOfLife.Specs
 
             board.TryGetCell(1, 1).IsAlive.Should().BeFalse();
         }
+
+        [Fact]
+        public void WhenCloningTheBoard_TheClonedBoardIsNotTheSameReference()
+        {
+            var board = new BoardBuilder()
+                .WithRows(1)
+                .WithCols(1)
+                .Build();
+
+            var referencedBoard = board;
+            var clonedBoard = board.Clone();
+
+            referencedBoard.Should().Be(board);
+            clonedBoard.Should().NotBe(board);
+        }
+
+        [Fact]
+        public void WhenCloningTheBoard_TheCellsInTheClonedBoardShouldHaveTheSameProperties()
+        {
+            var aliveCellPositions = new KeyValueList<int, int>
+            {
+                { 0, 0 },
+                { 0, 1 }
+            };
+
+            var board = new BoardBuilder()
+                .WithRows(2)
+                .WithCols(2)
+                .WithAliveCellsOn(aliveCellPositions)
+                .Build();
+
+            var clonedBoard = board.Clone();
+
+            clonedBoard.Rows[0].Cells[0].ShouldBeEquivalentTo(board.Rows[0].Cells[0]);
+            clonedBoard.Rows[0].Cells[1].ShouldBeEquivalentTo(board.Rows[0].Cells[1]);
+            clonedBoard.Rows[1].Cells[0].ShouldBeEquivalentTo(board.Rows[1].Cells[0]);
+            clonedBoard.Rows[1].Cells[1].ShouldBeEquivalentTo(board.Rows[1].Cells[1]);
+        }
+
+        [Fact]
+        public void GivenNoCellsAreAlive_WhenCheckingIfAnyCellsAreAlive_ItReturnsFalse()
+        {
+            var board = new BoardBuilder()
+                .WithRows(2)
+                .WithCols(2)
+                .Build();
+
+            board.AnyCellsAlive().Should().BeFalse();
+        }
+
+        [Fact]
+        public void GivenOneCellIsAlive_WhenCheckingIfAnyCellsAreAlive_ItReturnsTrue()
+        {
+            var aliveCellPositions = new KeyValueList<int, int>
+            {
+                { 0, 0 }
+            };
+
+            var board = new BoardBuilder()
+                .WithRows(2)
+                .WithCols(2)
+                .WithAliveCellsOn(aliveCellPositions)
+                .Build();
+
+            board.AnyCellsAlive().Should().BeTrue();
+        }
+        
+        [Fact]
+        public void GivenTwoBoardsAreEqual_WhenCheckingIfBoardsAreEqual_ItReturnsTrue()
+        {
+            var aliveCellPositions = new KeyValueList<int, int>
+            {
+                { 0, 0 }
+            };
+
+            var board = new BoardBuilder()
+                .WithRows(2)
+                .WithCols(2)
+                .WithAliveCellsOn(aliveCellPositions)
+                .Build();
+
+            var otherBoard = board.Clone();
+
+            otherBoard.AreBoardsEqual(board).Should().BeTrue();
+        }
+
+        [Fact]
+        public void GivenTwoBoardsAreNotEqual_WhenCheckingIfBoardsAreEqual_ItReturnsFalse()
+        {
+            var boardAlivePositions = new KeyValueList<int, int>
+            {
+                { 0, 0 }
+            };
+
+            var board = new BoardBuilder()
+                .WithRows(2)
+                .WithCols(2)
+                .WithAliveCellsOn(boardAlivePositions)
+                .Build();
+
+            var otherBoardAlivePositions = new KeyValueList<int, int>
+            {
+                { 0, 1 }
+            };
+
+            var otherBoard = new BoardBuilder()
+                .WithRows(2)
+                .WithCols(2)
+                .WithAliveCellsOn(otherBoardAlivePositions)
+                .Build();
+
+            otherBoard.AreBoardsEqual(board).Should().BeFalse();
+        }
     }
 }

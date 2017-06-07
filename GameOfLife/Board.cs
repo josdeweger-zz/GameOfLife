@@ -21,10 +21,7 @@ namespace GameOfLife
     {
         public List<Row> Rows { get; private set; }
 
-        private readonly int _rows;
-        private readonly int _cols;
-
-        public Board(int rows, int cols)
+        public Board(int rows, int cols, List<KeyValuePair<int, int>> aliveCellPositions)
         {
             if (rows <= 0)
                 throw new ArgumentException($"{nameof(rows)} can not be 0 or less");
@@ -32,20 +29,12 @@ namespace GameOfLife
             if (cols <= 0)
                 throw new ArgumentException($"{nameof(cols)} can not be 0 or less");
 
-            _rows = rows;
-            _cols = cols;
-
-            Rows = new List<Row>(_rows);
-        }
-
-        public void Create(List<KeyValuePair<int, int>> aliveCellPositions)
-        {
             Rows = Enumerable
-                .Range(0, _rows)
+                .Range(0, rows)
                 .Select((rowNum, row) => new Row()
                 {
                     Cells = Enumerable
-                        .Range(0, _cols)
+                        .Range(0, cols)
                         .Select((colNum, cell) =>
                         {
                             var isAlive = aliveCellPositions.Contains(new KeyValuePair<int, int>(rowNum, colNum));
@@ -70,17 +59,44 @@ namespace GameOfLife
         public void NextGeneration()
         {
             var nextGeneration = Enumerable
-                .Range(0, _rows)
+                .Range(0, Rows.Count)
                 .Select((rowNum, row) => new Row()
                 {
                     Cells = Enumerable
-                        .Range(0, _cols)
+                        .Range(0, Rows[rowNum].Cells.Count)
                         .Select((colNum, cell) => CreateNextGenerationCell(rowNum, colNum))
                         .ToList()
                 })
                 .ToList();
 
             Rows = nextGeneration;
+        }
+
+        public bool AnyCellsAlive()
+        {
+            return Rows.Any(r => r.Cells.Any(c => c.IsAlive));
+        }
+
+        public bool AreBoardsEqual(Board newBoard)
+        {
+            for (var rowNum = 0; rowNum < newBoard.Rows.Count; rowNum++)
+            {
+                var oldRow = Rows[rowNum];
+                var newRow = newBoard.Rows[rowNum];
+
+                for (var colNum = 0; colNum < newRow.Cells.Count; colNum++)
+                {
+                    if (oldRow.Cells[colNum].IsAlive != newRow.Cells[colNum].IsAlive)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        public Board Clone()
+        {
+            return (Board)MemberwiseClone();
         }
 
         private Cell CreateNextGenerationCell(int rowNum, int colNum)

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace GameOfLife.ConsoleApp
@@ -16,8 +18,8 @@ namespace GameOfLife.ConsoleApp
             };
 
             var board = new BoardBuilder()
-                .WithRows(10)
-                .WithCols(10)
+                .WithRows(7)
+                .WithCols(7)
                 .WithAliveCellsOn(aliveCellPositions)
                 .Build();
 
@@ -25,35 +27,61 @@ namespace GameOfLife.ConsoleApp
             {
                 Console.Clear();
 
-                for (var i = 0; i <= board.Rows.First().Cells.Count * 4; i++)
-                    Console.Write("-");
+                WriteHorizontalLine(board.Rows.First().Cells.Count);
 
                 foreach (var row in board.Rows)
                 {
                     Console.WriteLine();
-                    Console.Write("|");
+                    WriteVerticalLine();
 
                     foreach (var cell in row.Cells)
                     {
                         Console.Write(cell.IsAlive ? " x " : "   ");
-                        Console.Write("|");
+                        WriteVerticalLine();
                     }
 
                     Console.WriteLine();
-
-                    for(var i = 0; i <= row.Cells.Count * 4; i++)
-                        Console.Write("-");
+                    WriteHorizontalLine(board.Rows.First().Cells.Count);
                 }
+
+                var oldBoard = board.Clone();
 
                 board.NextGeneration();
 
-                Thread.Sleep(500);
-
-                if (!board.Rows.Any(r => r.Cells.Any(c => c.IsAlive)))
+                if (!board.AnyCellsAlive())
+                {
+                    WriteMessage("All cells are dead.");
                     break;
+                }
+
+                if(oldBoard.AreBoardsEqual(board))
+                {
+                    WriteMessage("The situation is stable.");
+                    break;
+                }
+
+                Thread.Sleep(500);
             }
 
             Console.ReadLine();
+        }
+
+        private static void WriteMessage(string message)
+        {
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(message);
+        }
+
+        private static void WriteHorizontalLine(int nrOfCells)
+        {
+            for (var i = 0; i <= nrOfCells * 4; i++)
+                Console.Write("-");
+        }
+
+        private static void WriteVerticalLine()
+        {
+            Console.Write("|");
         }
     }
 }

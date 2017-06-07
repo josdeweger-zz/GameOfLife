@@ -31,9 +31,7 @@ namespace GameOfLife
 
         public Board Build()
         {
-            var board = new Board(_rows, _cols);
-
-            board.Create(_aliveCellPositions);
+            var board = new Board(_rows, _cols, _aliveCellPositions);
 
             return board;
         }
